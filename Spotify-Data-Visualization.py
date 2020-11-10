@@ -1,8 +1,9 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
-import seaborn as sb
 from matplotlib import pyplot as plt 
+from matplotlib.figure import Figure as fig
+import statistics as stat
 
 # Retrieved client id and client secret from Spotify app dashboard
 cli_id = '21357e5761f84b0397e2b26cb9a8fbc7'
@@ -46,22 +47,47 @@ audio_df = audio_df.drop(['duration_ms', 'track_href', 'type', 'analysis_url', '
 # Add track_popularity as a column in audio_df
 audio_df['popularity'] = track_popularity
 
+# Creates arrays containing the data and data mean of each audio feature
 danceability = audio_df['danceability']
+mean_dance = stat.mean(danceability)
+
 energy = audio_df['energy']
-instrumentalness = audio_df['instrumentalness']
-loudness = audio_df['loudness']
+mean_energy = stat.mean(energy)
+
+speechiness = audio_df['speechiness']
+mean_speech = stat.mean(speechiness)
+
+acousticness = audio_df['acousticness']
+mean_acoustic = stat.mean(acousticness)
+
 valence = audio_df['valence']
-tempo = audio_df['tempo']
+mean_valence = stat.mean(valence)
+
 popularity = audio_df['popularity']
 
-plt.scatter(danceability, popularity, label='Danceability', s=75, c='#00fa58')
-plt.scatter(valence, popularity, label='Valence', s=75, c='#000000')
-plt.scatter(energy, popularity, label='Energy', s=75, c='#00802d')
+fig, (plt1, plt2) = plt.subplots(2, 1)
 
-plt.title('Spotify Top Songs of 2019')
-plt.xlabel('Audio Features')
-plt.ylabel('Popularity')
+# Plots danceability and energy against popularity 
+plt1.scatter(danceability, popularity, label='Danceability', s=50, c='#000000', marker='+')
+plt1.scatter(energy, popularity, label='Energy', s=50, c='#00802d', marker='+')
 
-plt.legend()
+# Add plt1 y label and legend
+plt1.set_ylabel('Popularity')
+plt1.legend()
+
+# Creates lists for the input values of plt2
+plt2_xlabels = ['Danceablility', 'Energy', 'Speechiness', 'Acousticness', 'Valence']
+plt2_data = [mean_dance, mean_energy, mean_speech, mean_acoustic, mean_valence]
+
+# Graphs mean of audio features
+plt2.bar(plt2_xlabels, plt2_data, color='#00802d')
+
+# Add plt2 y label
+plt2.set_ylabel('Feature Means')
+
+# Add window title, plot title, set style, show plot
+fig.suptitle('Song Audio Features')
+win = plt.get_current_fig_manager()
+win.canvas.set_window_title('Spotify Data')
 plt.style.use('grayscale')
 plt.show()
